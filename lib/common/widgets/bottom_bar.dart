@@ -30,7 +30,7 @@ class _BottomBarState extends State<BottomBar> {
               decoration: BoxDecoration(
                   border: Border(
                       top: BorderSide(
-                          color: _page == 0
+                          color: _page == 1
                               ? GlobalVariables.selectedNavBarColor
                               : GlobalVariables.backgroundColor,
                           width: bottomBarBorderWidth))),

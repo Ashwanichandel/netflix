@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:netflix/common/widgets/bottom_bar.dart';
 import 'package:netflix/common/widgets/custom_button.dart';
 import 'package:netflix/common/widgets/custom_textfield.dart';
 import 'package:netflix/constant/global_variables.dart';
@@ -43,12 +46,13 @@ class _AuthScreenState extends State<AuthScreen> {
         name: _nameController.text);
   }
 
-  void signInUser() {
-    authService.sigInUser(
+  Future<bool> signInUser() async {
+    bool result = await authService.sigInUser(
       context: context,
       email: _emailController.text,
       password: _passwordController.text,
     );
+    return result;
   }
 
   @override
@@ -121,6 +125,8 @@ class _AuthScreenState extends State<AuthScreen> {
                             onTap: () {
                               if (_signUpFormKey.currentState!.validate()) {
                                 signUpUser();
+                              } else {
+                                log('aasdf');
                               }
                             }),
                       ],
@@ -169,9 +175,15 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         CustomButton(
                             text: 'Sign-In',
-                            onTap: () {
+                            onTap: () async {
                               if (_signInFormKey.currentState!.validate()) {
-                                signInUser();
+                                bool result = await signInUser();
+                                if (result) {
+                                  if (mounted)
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) => BottomBar()));
+                                }
                               }
                             }),
                       ],

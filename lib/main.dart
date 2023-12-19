@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:netflix/common/widgets/bottom_bar.dart';
 import 'package:netflix/constant/global_variables.dart';
 import 'package:netflix/features/auth/screens/auth_screen.dart';
+import 'package:netflix/home/screens/home_screen.dart';
 import 'package:netflix/provider/user_provider.dart';
 import 'package:netflix/router.dart';
 import 'package:netflix/services/auth_service.dart';
+import 'package:netflix/widgets/main_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -23,14 +25,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final AuthService authService = AuthService();
-
-  @override
-  void initState() {
-    super.initState();
-    authService.GetUserData(context);
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -47,8 +41,6 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         onGenerateRoute: (settings) => generateRoute(settings),
-        home: Provider.of<UserProvider>(context).user.token.isNotEmpty
-            ? const BottomBar()
-            : const AuthScreen());
+        home: MainScreen());
   }
 }

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:developer';
+//import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:netflix/common/widgets/bottom_bar.dart';
@@ -12,7 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  void sigUpUser(
+  Future<bool> sigUpUser(
       {required BuildContext context,
       required String email,
       required String password,
@@ -27,30 +29,36 @@ class AuthService {
         //type: '',
         token: '',
       );
+      // print("hello jk");
       http.Response res = await http.post(
         Uri.parse('$uri/api/signup'),
         body: user.toJson(),
         headers: <String, String>{
-          'Content-Type': 'application/json;charset=UTF-8'
+          'Content-Type': 'application/json; charset=UTF-8'
         },
       );
-      httpErrorHandle(
-          response: res,
-          context: context,
-          onSuccess: () {
-            showSnackBar(
-                context, 'Account created ! Login with the same credential');
-          });
+      log(res.body);
+      bool result = httpErrorHandle(
+        response: res,
+        context: context,
+      );
+      if (result) {
+        showSnackBar(
+            context, 'Account created ! Login with the same credential');
+        return true;
+      }
     } catch (e) {
       showSnackBar(context, e.toString());
     }
+    return false;
   }
 
-  void sigInUser({
+  Future<bool> sigInUser({
     required BuildContext context,
     required String email,
     required String password,
   }) async {
+    print(context);
     try {
       http.Response res = await http.post(
         Uri.parse('$uri/api/signin'),
@@ -62,24 +70,25 @@ class AuthService {
           'Content-Type': 'application/json;charset=UTF-8'
         },
       );
-      httpErrorHandle(
-          response: res,
-          context: context,
-          onSuccess: () async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            Provider.of<UserProvider>(context, listen: false).setUser(res.body);
+      bool result = httpErrorHandle(
+        response: res,
+        context: context,
+      );
+      if (result) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        Provider.of<UserProvider>(context, listen: false).setUser(res.body);
 
-            await prefs.setString(
-                'x-auth-token', jsonDecode(res.body)['token']);
-            Navigator.pushNamedAndRemoveUntil(
-                context, BottomBar.routeName, (route) => false);
-          });
+        await prefs.setString('x-auth-token', jsonDecode(res.body)['token']);
+        return true;
+      }
     } catch (e) {
       showSnackBar(context, e.toString());
+      return false;
     }
+    return false;
   }
 
-  void GetUserData(
+  Future<void> GetUserData(
     BuildContext context,
   ) async {
     try {
